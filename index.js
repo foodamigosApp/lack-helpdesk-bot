@@ -3,14 +3,22 @@ import express from "express";
 const app = express();
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Slack Helpdesk Bot is running!");
+// Slack URL verification
+app.post("/slack/events", (req, res) => {
+  const { type, challenge } = req.body;
+
+  // If Slack is verifying the URL, respond with the challenge
+  if (type === "url_verification") {
+    return res.send(challenge);
+  }
+
+  // Handle regular events later
+  console.log("Slack event received:", req.body);
+  res.sendStatus(200);
 });
 
-// This endpoint will receive messages from Slack
-app.post("/slack/events", (req, res) => {
-  console.log(req.body);
-  res.sendStatus(200);
+app.get("/", (req, res) => {
+  res.send("Slack Helpdesk Bot is running!");
 });
 
 const port = process.env.PORT || 3000;
